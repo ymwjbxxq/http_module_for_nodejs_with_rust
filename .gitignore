@@ -1,0 +1,9 @@
+target
+index.node
+**/node_modules
+**/.DS_Store
+npm-debug.log*
+*.lock
+package-lock.json
+.vscode/settings.json
+native/artifacts.json

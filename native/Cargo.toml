@@ -1,0 +1,23 @@
+[package]
+name = "http_rust"
+version = "0.1.0"
+license = "ISC"
+edition = "2018"
+build = "build.rs"
+exclude = ["index.node"]
+
+[lib]
+name = "http_rust"
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+[build-dependencies]
+neon-build = "0.9"
+
+[dependencies.neon]
+version = "0.9.1"
+default-features = false
+features = ["napi-6"]
