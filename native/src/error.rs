@@ -1,5 +1,5 @@
+use neon::result::Throw;
 use std::fmt::{self, Debug};
-use neon::{result::Throw};
 
 #[derive(Debug)]
 pub enum ApplicationError {
@@ -25,6 +25,42 @@ impl fmt::Display for ApplicationError {
 impl From<Throw> for ApplicationError {
     fn from(value: Throw) -> ApplicationError {
         ApplicationError::SdkError(format!("NEON sdk error {}", value))
+    }
+}
+
+impl From<reqwest::Error> for ApplicationError {
+    fn from(e: reqwest::Error) -> ApplicationError {
+        let url = e.url().unwrap().to_string();
+        println!("URL {}", url);
+
+        if e.is_connect() {
+          return ApplicationError::ClientError(format!(
+                "NOT FOUND: The request {:?} is not found",
+                url
+            ));
+        }
+
+        if e.is_timeout() {
+            return ApplicationError::ClientError(format!(
+                "TIMEOUT: The request {:?} timed out while trying to connect to the remote server",
+                url
+            ));
+        }
+
+        if e.is_decode() {
+            return ApplicationError::ClientError(format!(
+                "PARSING: invalid response from server {:?}",
+                url
+            ));
+        }
+
+        ApplicationError::SdkError(format!("reqwest sdk error {:?}", e))
+    }
+}
+
+impl From<serde_json::error::Error> for ApplicationError {
+    fn from(value: serde_json::error::Error) -> ApplicationError {
+        ApplicationError::ClientError(format!("Cannot convert to stirng {}", value))
     }
 }
 

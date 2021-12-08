@@ -1,23 +1,16 @@
 const rust = require("./native/index.node");
 
-function anotherAsyncCall() {
-  return new Promise(resolve => {
-    console.log("START*********");
-    try {
-      const request = {
-        url: "someURL",
-        method: "GET",
-      }
-      console.log("RUST*********", rust.run(request));
-    } catch (error) {
-      console.log("ERROR*********", error);
+(async () => {
+  console.log("START*********");
+  try {
+    const request = {
+      url: "https://httpbin.org/ip",
+      method: "GET",
     }
-    console.log("END*********");
-  });
-}
-
-async function asyncCall() {
-  await anotherAsyncCall();
-}
-
-asyncCall();
+    const response = rust.get(request);
+    console.log(JSON.parse(response.data));
+  } catch (error) {
+    console.log(error);
+  }
+  console.log("END*********");
+})();

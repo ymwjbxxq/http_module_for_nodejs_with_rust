@@ -1,8 +1,8 @@
+use crate::dtos::http_method::HttpMethod;
 use neon::prelude::*;
-
 use crate::error::ApplicationError;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct HttpRequest {
     pub url: String,
     pub method: HttpMethod,
@@ -29,38 +29,5 @@ impl HttpRequest {
             url: rust_url,
             method: HttpMethod::from_str(&rust_method),
         })
-    }
-
-    pub fn to_js<'a>(&self, cx: &mut FunctionContext<'a>) -> JsResult<'a, JsObject> {
-        let url = cx.string(&self.url);
-        let method = cx.string(&self.method.to_string());
-
-        let object = cx.empty_object();
-        object.set(cx, "url", url).unwrap();
-        object.set(cx, "method", method).unwrap();
-
-        Ok(object)
-    }
-}
-
-#[derive(Debug)]
-pub enum HttpMethod {
-    GET,
-    POST,
-}
-impl HttpMethod {
-    pub fn from_str(s: &str) -> Self {
-        match s {
-            "GET" => HttpMethod::GET,
-            "POST" => HttpMethod::POST,
-            _ => HttpMethod::GET,
-        }
-    }
-
-    pub fn to_string(&self) -> String {
-        match self {
-            HttpMethod::GET => "GET".to_string(),
-            HttpMethod::POST => "POST".to_string(),
-        }
     }
 }
