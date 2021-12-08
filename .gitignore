@@ -7,3 +7,4 @@ npm-debug.log*
 package-lock.json
 .vscode/settings.json
 native/artifacts.json
+index.js
