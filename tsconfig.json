@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "inlineSourceMap": true,
+    "baseUrl": "./"
+  },
+  "exclude": [
+    "tests/**/*.ts",
+    "node_modules"
+  ]
+}
