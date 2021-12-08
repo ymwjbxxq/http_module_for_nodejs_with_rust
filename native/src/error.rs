@@ -30,11 +30,19 @@ impl From<Throw> for ApplicationError {
 
 impl From<reqwest::Error> for ApplicationError {
     fn from(e: reqwest::Error) -> ApplicationError {
-        let url = e.url().unwrap().to_string();
-        println!("URL {}", url);
+        let mut url = String::new();
+        if e.url().is_some() {
+            url = e.url().unwrap().to_string();
+        }
+
+        if e.is_body() {
+            return ApplicationError::ClientError(format!(
+                "NOT FOUND: The request body is not a JSON"
+            ));
+        }
 
         if e.is_connect() {
-          return ApplicationError::ClientError(format!(
+            return ApplicationError::ClientError(format!(
                 "NOT FOUND: The request {:?} is not found",
                 url
             ));

@@ -19,7 +19,6 @@ fn get(mut cx: FunctionContext) -> JsResult<JsObject> {
     let request = HttpRequest::from_js(&mut cx).unwrap();
     let shared_request = Arc::from(request.clone());
     let future = async move {
-        println!("*** future starting!!");
         let res = fetch_url(&shared_request.url).await;
         res
     };
