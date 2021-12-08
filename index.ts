@@ -2,6 +2,7 @@ const rust = require("./native/index.node");
 import fetch from 'node-fetch';
 
 const LOOP_COUNT = 10;
+const URL = "YOUR_URL";
 
 export const startExecution: any = async (): Promise<void> => {
   let now = new Date();
@@ -27,7 +28,7 @@ export const startExecution: any = async (): Promise<void> => {
 
 async function native_fetch() {
   const request = {
-    url: "https://hnpqzz25rh.execute-api.eu-central-1.amazonaws.com/test",
+    url: URL,
     method: "GET",
   }
   const response = rust.get(request);
@@ -35,7 +36,7 @@ async function native_fetch() {
 }
 
 async function node_fetch() {
-  const response = await fetch('https://hnpqzz25rh.execute-api.eu-central-1.amazonaws.com/test');
+  const response = await fetch(URL);
   const body = await response.json();
 
   console.log(body);
