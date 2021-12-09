@@ -1,10 +1,12 @@
 {
-  "name": "test",
+  "name": "http_rust",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cargo-build": "cd native/ && cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics",
+    "cargo-build-release": "npm run cargo-build -- --release",
+    "cargo-install": "npm run cargo-build"
   },
   "engines": {
     "node": ">=8.x"
@@ -12,10 +14,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "neon-cli": "^0.1.20",
-    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
+    "node-fetch": "^2.6.1",
+    "cargo-cp-artifact": "^0.1",
     "@types/node": "^16.11.12",
     "typescript": "^4.5.2"
   }
