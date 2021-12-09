@@ -3,8 +3,8 @@ use dtos::http_request::HttpRequest;
 use error::ApplicationError;
 use neon::prelude::*;
 use std::collections::HashMap;
-use std::sync::Arc;
-use tokio;
+use tokio::runtime::Runtime;
+use once_cell::sync::OnceCell;
 pub mod dtos;
 pub mod error;
 
@@ -15,29 +15,29 @@ pub fn main(mut cx: ModuleContext) -> NeonResult<()> {
     Ok(())
 }
 
-fn get(mut cx: FunctionContext) -> JsResult<JsObject> {
+fn runtime<'a, C: Context<'a>>(cx: &mut C) -> NeonResult<&'static Runtime> {
+    static RUNTIME: OnceCell<Runtime> = OnceCell::new();
+
+    RUNTIME.get_or_try_init(|| Runtime::new().or_else(|err| cx.throw_error(err.to_string())))
+}
+
+fn get(mut cx: FunctionContext) -> JsResult<JsPromise> {
     let request = HttpRequest::from_js(&mut cx).unwrap();
-    let shared_request = Arc::from(request.clone());
-    let future = async move {
-        let res = fetch_url(&shared_request.url).await;
-        res
-    };
-
-    let http_response = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(future);
-
-    let http_response = match http_response {
-        Ok(res) => res,
-        Err(e) => {
-          return cx.throw_error(e.to_string());
-        }
-    };
-
-    let object = http_response.to_js(&mut cx)?;
-    return Ok(object);
+    let rt = runtime(&mut cx)?;
+    let channel = cx.channel();
+    let (deferred, promise) = cx.promise();
+    rt.spawn(async move {
+        let response = fetch_url(&request.url).await;
+        deferred.settle_with(&channel, move |mut cx| {
+            // Convert a `reqwest::Error` to a JavaScript exception
+            let http_response = response.or_else(|err| cx.throw_error(err.to_string()))?;
+            let object = http_response.to_js(&mut cx)?;
+            Ok(object)
+        });
+    });
+    
+    // Return the promise back to JavaScript
+    Ok(promise)
 }
 
 async fn fetch_url(url: &str) -> Result<HttpResponse, ApplicationError> {
