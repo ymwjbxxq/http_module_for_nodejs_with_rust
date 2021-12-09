@@ -45,7 +45,8 @@ Change the URL that you want to HIT inside index.ts
 3. from the root compile TypeScript with tsc
 4. node index.js
 
-You should be able to see something like this.
+You should be able to see something like this with 100 requests.
+Results are from my machine so it could change based on your computer settings.
 
 ```bash
 START native 2021-12-08T15:37:13.670Z
@@ -59,7 +60,7 @@ START native 2021-12-08T15:37:13.670Z
 { message: 'Go ahead without me' }
 { message: 'Go ahead without me' }
 { message: 'Go ahead without me' }
-END*********1543ms
+END*********441
 START node-fetch 2021-12-08T15:37:15.213Z
 { message: 'Go ahead without me' }
 { message: 'Go ahead without me' }
@@ -71,22 +72,10 @@ START node-fetch 2021-12-08T15:37:15.213Z
 { message: 'Go ahead without me' }
 { message: 'Go ahead without me' }
 { message: 'Go ahead without me' }
-END*********138ms
+END*********524ms
 ```
 
-As you can see, Rust took 1543ms vs pure Node 138ms
+The results are always different sometimes. Native is slower, sometimes faster, but the point here is not which one is faster but that we can integrate the power of Rust in our javascript application.
 
-I think I have a problem with this code [Bridging with sync code](https://tokio.rs/tokio/topics/bridging)
-
-```Rust
-let http_response = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(async {
-            let res = fetch_url(&shared_request.url).await;
-            res
-        });
-```
-
-I am still working on this.
+Thanks to the Neon members for the support to point out the problems.
+They even add an example https://github.com/neon-bindings/examples/pull/82.
